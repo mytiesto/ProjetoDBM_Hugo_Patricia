@@ -1,0 +1,11 @@
+{
+    "title": "Album",
+    "description": "The album schema represents an Album",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        }
+    },
+    "required": ["name"]
+}

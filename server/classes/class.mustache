@@ -1,0 +1,11 @@
+class {{title}} {
+    constructor({{arguments}}) {
+        this.id = id;
+        {{#properties}}
+        this.{{name}} = name;
+        {{/properties}}
+        {{#enumerables}}
+        Object.defineProperty(this, "{{name}}", { enumerable: false });
+        {{/enumerables}}
+    }
+}
