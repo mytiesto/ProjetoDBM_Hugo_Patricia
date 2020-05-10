@@ -1,0 +1,8 @@
+{{#schemas}}
+CREATE TABLE IF NOT EXISTS {{title}} (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    {{#properties}}
+    {{{property}}} 
+    {{/properties}}
+);
+{{/schemas}}

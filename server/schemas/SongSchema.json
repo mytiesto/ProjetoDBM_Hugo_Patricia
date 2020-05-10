@@ -6,17 +6,14 @@
         "name": {
             "type": "string"
         },
-        "artist": {
-            "type": "integer",
-            "foreignSchema": "Artist"
+        "artist_id": {
+            "type": "integer"
         },
-        "album": {
-            "type": "integer",
-            "foreignSchema": "Album"
+        "album_id": {
+            "type": "integer"
         },
-        "genre": {
-            "type": "integer",
-            "foreignSchema": "Genre"
+        "genre_id": {
+            "type": "integer"
         }
     },
     "required": ["name"]
