@@ -1,0 +1,28 @@
+var express = require("express");
+var app = express();
+app.use(express.static('Public'));
+
+app.get('/', function (req, res) {
+    res.send('Verbo: ${req.method} URL: ${req.url}');
+});
+
+app.post('/', function (req, res) {
+    res.send('Verbo: ${req.method} URL: ${req.url} BODY: ${req.body}');
+});
+
+app.post('/generate', function (req, res) {
+    generate();
+    
+    
+});
+
+var server = app.listen({{port}}, function () {
+    var host = server.address().address === "::" ? "localhost" :
+    server.address().address;
+    console.log("Example app listening at http://%s:%s", host, {{port}});
+   });
+
+server.on("error", (error) => {
+    if(error.message.includes("address already in use"))
+        server.close();
+});
