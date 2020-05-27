@@ -1,0 +1,11 @@
+{
+    "title": "Genre",
+    "description": "The genre schema represents an Genre",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        }
+    },
+    "required": ["name"]
+}

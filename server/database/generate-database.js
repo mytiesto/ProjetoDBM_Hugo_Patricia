@@ -83,7 +83,6 @@ var run = function(db, schemas, callback){
             view.schemas.push(schema);
         });
         var output = mustache.render(data.toString(), view);
-        console.log(output);
         db.exec(output);
         callback;
     });

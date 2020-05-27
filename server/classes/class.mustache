@@ -1,11 +1,33 @@
+var database = require("../Database/sqlite-wrapper")("./publish/Database/{{dbname}}");
 class {{title}} {
     constructor({{arguments}}) {
-        this.id = id;
         {{#properties}}
-        this.{{name}} = name;
+        this.{{name}} = {{name}};
         {{/properties}}
         {{#enumerables}}
         Object.defineProperty(this, "{{name}}", { enumerable: false });
         {{/enumerables}}
+        Object.defineProperty(this, "id", { enumerable: false, writable: true });
+    }
+
+    static all(callback) {
+        database.where("SELECT * FROM {{title}};", [], {{title}}, callback)
+    }
+
+    static get(id, callback) {
+        database.get("SELECT * FROM {{title}} WHERE id = ?;", [id], {{title}}, callback)
+    }
+
+    static delete(id, callback) {
+        database.run("DELETE FROM {{title}} WHERE id = ?;", [id], callback)
+    }
+
+    save(callback) {
+        if (this.id)
+            database.run("UPDATE {{title}} SET {{{updateProperties}}} WHERE id = ?;", [{{#properties}}this.{{name}}, {{/properties}}this.id], callback);
+        else
+            database.run("INSERT INTO {{title}} ({{arguments}}) VALUES ({{values}});", [{{insertProperties}}], callback);
     }
 }
+
+module.exports = {{title}};

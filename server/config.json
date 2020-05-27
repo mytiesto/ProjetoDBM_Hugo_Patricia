@@ -1,0 +1,37 @@
+{
+    "dbname": "projeto.db",
+    "ip": "localhost",
+    "port" : 8081,
+    "modules": [],
+    "folders": [
+        "Controllers",
+        "Models", 
+        {
+            "Public": [
+                "Css",
+                "Images",
+                "Js"
+            ]
+        },
+        "Schemas",
+        "Views",
+        "Database"
+    ],
+    "staticFiles": [{
+        "originalPath": "./server/database/sqlite-wrapper.js",
+        "destinationPath": "./publish/Database/sqlite-wrapper.js"
+    }],
+    "schemas": [{
+        "name": "Album",
+        "path": "./server/schemas/AlbumSchema.json"
+    },{
+        "name": "Artist",
+        "path": "./server/schemas/ArtistSchema.json"
+    },{
+        "name": "Genre",
+        "path": "./server/schemas/GenreSchema.json"
+    },{
+        "name": "Song",
+        "path": "./server/schemas/SongSchema.json"
+    }]
+}

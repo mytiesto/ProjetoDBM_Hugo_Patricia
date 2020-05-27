@@ -1,12 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser')
-const dbname = "projeto.db";
+const dbname = "{{dbname}}";
+{{#modules}}
+const {{varName}} = require('{{moduleName}}');
+{{/modules}}
 
 const api = require("./publish/Controllers/api");
 
 const app = express();
-const port = 8081;
-const ip = "localhost";
+const port = {{port}};
+const ip = "{{ip}}";
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }))

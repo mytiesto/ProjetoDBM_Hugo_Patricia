@@ -1,0 +1,60 @@
+var express = require('express');
+var router = express.Router();
+
+{{#schemas}}
+var {{name}} = require('../Models/{{name}}.js');
+
+router.post('/{{name}}', function (req, res) {
+    let new{{name}} = Object.assign(new {{name}}(), req.body);
+    new{{name}}.save((ret) => {
+        if(ret.success)
+            res.send("{{name}} created with success");
+        else
+            res.send(ret.error);
+    });
+});
+
+router.get('/{{name}}', function (req, res) {
+    {{name}}.all((rows) => {
+        res.send(JSON.stringify(rows));
+    });
+});
+
+router.get('/{{name}}/:id', function (req, res) {
+    let id = req.params.id;
+    {{name}}.get(id, (row) => {
+        res.send(JSON.stringify(row));
+    });
+});
+
+router.put('/{{name}}/:id', function (req, res) {
+    let obj = Object.assign(new {{name}}(), req.body);
+    obj.id = req.params.id;
+    obj.save((ret) => {
+        if(ret.success){
+            if(ret.rowsAffected > 0)
+                res.send("{{name}} updated with success");
+            else
+                res.send("{{name}} with that id not found");
+        } else {
+            res.send(ret.error)
+        }
+    });
+});
+
+router.delete('/{{name}}/:id', function (req, res) {
+    let id = req.params.id;
+    {{name}}.delete(id, (ret) => {
+        if(ret.success){
+            if(ret.rowsAffected > 0)
+                res.send("{{name}} deleted with success");
+            else
+                res.send("{{name}} with that id not found");
+        } else {
+            res.send(ret.error)
+        }
+    });
+});
+{{/schemas}}
+
+module.exports = router;
