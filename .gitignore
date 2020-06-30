@@ -114,3 +114,15 @@ publish/Schemas/AlbumSchema.json
 publish/Schemas/ArtistSchema.json
 publish/Schemas/GenreSchema.json
 publish/Schemas/SongSchema.json
+publish/Database/projeto.db
+publish/Controllers/api.js
+publish/Database/projeto.db
+publish/Database/sqlite-wrapper.js
+publish/Models/Album.js
+publish/Models/Artist.js
+publish/Models/Genre.js
+publish/Models/Song.js
+publish/Schemas/AlbumSchema.json
+publish/Schemas/ArtistSchema.json
+publish/Schemas/GenreSchema.json
+publish/Schemas/SongSchema.json
