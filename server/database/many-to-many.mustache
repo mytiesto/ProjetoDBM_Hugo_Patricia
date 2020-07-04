@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS {{firstTableName}}_{{secondTableName}}_ManyToMany(
+    {{firstTableName}}_id INTEGER NOT NULL REFERENCES {{firstTableName}}(id),
+    {{secondTableName}}_id INTEGER NOT NULL REFERENCES {{secondTableName}}(id),
+    PRIMARY KEY ({{firstTableName}}_id, {{secondTableName}}_id)
+);

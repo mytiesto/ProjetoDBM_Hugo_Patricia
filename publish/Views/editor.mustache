@@ -1,0 +1,40 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Col. Name</th>
+      <th scope="col">Type</th>
+      <th scope="col">Required</th>
+      <th scope="col">Reference</th>
+      <th scope="col">Relation</th>
+      <th scope="col">Label</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#col}}
+    <tr>
+        <td><input name="colName" type="text" placeholder="Col. name" value="{{colName}}" class="form-control"></th>
+        <td><input name="type" type="text" placeholder="Type" value="{{type}}" class="form-control"></td>
+        <td>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="required" id="required" {{required}}>
+            </div>
+        </td>
+        <td>
+            <select class="form-select">
+                {{#otherSchemas}}
+                <option value="{{name}}" {{selected}}>{{name}}</option>
+                {{/otherSchemas}}
+            </select>
+        </td>
+        <td>
+            <select class="form-select">
+                {{#relations}}
+                <option value="{{name}}" {{selected}}>{{name}}</option>
+                {{/relations}}
+            </select>
+        </td>
+        <td><input name="type" type="text" placeholder="Label" value="{{label}}" class="form-control"></td>
+    </tr>
+    {{/col}}
+  </tbody>
+</table>

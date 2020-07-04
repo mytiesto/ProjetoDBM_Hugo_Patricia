@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    </head>
+    <body>
+        {{>menu}}
+        <div class="text-center">
+            <h1>Inserir novo {{title}}</h1>
+        </div>
+        <div class="container text-center">
+            <form id="form" class="row g-3">
+                {{#properties}}
+                <div>
+                    <label for="input{{name}}" class="form-label">{{name}}:</label>
+                    <input type="text" name="{{name}}" class="form-control" id="input{{name}}">
+                </div>
+                {{/properties}}
+                {{#references}}
+                <label>{{model}}:</label>
+                <div id="div{{model}}value"></div>
+                {{/references}}
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+            <div id="alert" style="display: none;" class="alert alert-success" role="alert">
+                Guardado com sucesso.
+            </div>
+        </div>
+        <script>
+            var form = document.getElementById("form");
+            function handleForm(e) {
+                e.preventDefault();
+                let str = "";
+                let formInputElems = document.getElementById("form").getElementsByTagName("input");
+                let formSelectElems = document.getElementById("form").getElementsByTagName("select");
+                for (let elem of formInputElems) {
+                    if(elem.type == "checkbox" && elem.checked || elem.type != "checkbox")
+                        str += elem.getAttribute("name") + "=" + elem.value + "&";
+                }
+                for (let elem of formSelectElems) {
+                    str += elem.getAttribute("name") + "=" + elem.value + "&";
+                }
+                str = str.substring(0, str.length - 1);
+                var xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "/api/{{title}}", true);
+                xhttp.onreadystatechange = function () {
+                    if(xhttp.readyState === 4 && xhttp.status === 200) {
+                        document.getElementById("alert").setAttribute("style", "display: block;");
+                    }
+                }
+                xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+                xhttp.send(str);
+            } 
+            form.addEventListener('submit', handleForm);
+
+            function createSelectOptions(data, model, control, label){
+                var select = document.createElement("select");
+                select.name = model+"_id";
+                data.forEach(row => {
+                    var option = document.createElement("option");
+                    option.text = row["name"];
+                    option.value = row.id;
+                    select.add(option);
+                });
+                control.appendChild(select);
+            }
+
+            function createCheckboxOptions(data, model, control, label){
+                let name = label;
+                data.forEach((row, index) => {
+                    let checkBox = document.createElement("input");
+                    checkBox.type = "checkbox";
+                    checkBox.name = name;
+                    checkBox.value = row.id;
+                    checkBox.id = "cb_"+(index+1);
+                    control.appendChild(checkBox);
+                    let label = document.createElement("label");
+                    label.setAttribute("for", checkBox.id);
+                    label.innerHTML = row["name"];
+                    control.appendChild(label);
+                });
+            }
+
+            {{#hasReferences}}
+            function loadValues(model, label, controlId, isManyToMany){
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", '/api/'+model, true);
+                xhr.onreadystatechange = function () {
+                    if(xhr.readyState === 4 && xhr.status === 200) {
+                        var control = document.getElementById(controlId);
+                        var response = JSON.parse(this.responseText);
+                        if(isManyToMany)
+                            createCheckboxOptions(response, model, control, label);
+                        else
+                            createSelectOptions(response, model, control, label);
+                    }
+                }
+                xhr.send();
+            }
+
+            window.onload = function() {
+                {{#references}}
+                let is{{model}}ManyToMany = "{{relation}}" == "M-M";
+                loadValues('{{model}}', '{{label}}', 'div{{model}}value', is{{model}}ManyToMany);
+                {{/references}}
+            }
+            {{/hasReferences}}
+   
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+    </body>
+</html>

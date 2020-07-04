@@ -20,6 +20,27 @@
     "staticFiles": [{
         "originalPath": "./server/database/sqlite-wrapper.js",
         "destinationPath": "./publish/Database/sqlite-wrapper.js"
+    },{
+        "originalPath": "./server/staticFiles/list.mustache",
+        "destinationPath": "./publish/Views/list.mustache"
+    },{
+        "originalPath": "./server/staticFiles/details.mustache",
+        "destinationPath": "./publish/Views/details.mustache"
+    },{
+        "originalPath": "./server/staticFiles/insert.mustache",
+        "destinationPath": "./publish/Views/insert.mustache"
+    },{
+        "originalPath": "./server/staticFiles/edit.mustache",
+        "destinationPath": "./publish/Views/edit.mustache"
+    },{
+        "originalPath": "./server/staticFiles/menu.mustache",
+        "destinationPath": "./publish/Views/menu.mustache"
+    },{
+        "originalPath": "./server/staticFiles/home.mustache",
+        "destinationPath": "./publish/Views/home.mustache"
+    },{
+        "originalPath": "./server/staticFiles/editor.mustache",
+        "destinationPath": "./publish/Views/editor.mustache"
     }],
     "schemas": [{
         "name": "Album",

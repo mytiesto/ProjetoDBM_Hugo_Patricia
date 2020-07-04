@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    </head>
+    <body>
+        {{>menu}}
+        <div class="text-center">
+            <h1>Detalhes de {{title}}</h1>
+        </div>
+        {{#properties}}
+        <div>
+            {{#isElse}}
+            <label>{{name}}:</label>
+            <label>{{value}}</label>
+            {{/isElse}}
+            {{#isImage}}
+            <label>{{name}}:</label>
+            <img src="{{value}}">
+            {{/isImage}}
+            {{#isVideo}}
+            <label>{{name}}:</label>
+            <iframe src="{{value}}"></iframe>
+            {{/isVideo}}
+        </div>
+        {{/properties}}
+        {{#references}}
+            <label>{{model}}:</label>
+            <label id="label{{model}}value"></label><br>
+        {{/references}}
+
+        <script>
+            {{#hasReferences}}
+                function loadValues(model,values,label,controlId, isManyToMany){
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", '/api/'+model+'/'+values, true);
+                    xhr.onreadystatechange = function () {
+                        if(xhr.readyState === 4 && xhr.status === 200) {
+                            var control = document.getElementById(controlId);
+                            var response = JSON.parse(this.responseText);
+                            if(response.constructor === Array)
+                                control.innerHTML = response.map(row => { return row["name"] }).join();
+                            else{
+                                if(isManyToMany)
+                                    control.innerHTML += response["name"]+", ";
+                                else
+                                    control.innerHTML += response["name"];
+                            }
+                                
+                        }
+                    }
+                    xhr.send();
+                }
+
+                function getUserManyToManyValues(model, controlId){
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", '/api/{{title}}/'+model+"/{{id}}", true);
+                xhr.onreadystatechange = function () {
+                    if(xhr.readyState === 4 && xhr.status === 200) {
+                        var response = JSON.parse(this.responseText);
+                        response.forEach((elem, index) => {
+                           loadValues(model, elem[model+"_id"], '{{labelRef}}', controlId, true) 
+                        })
+                    }
+                }
+                xhr.send();
+            }
+
+                window.onload = function() {
+                    {{#references}}
+                    if({{isManyToMany}})
+                        getUserManyToManyValues('{{model}}', 'label{{model}}value')
+                    else
+                        loadValues('{{model}}','{{values}}','{{labelRef}}','label{{model}}value');
+                    
+                    {{/references}}
+                }
+            {{/hasReferences}}
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+    </body>
+</html>

@@ -15,8 +15,17 @@ router.post('/{{name}}', function (req, res) {
 });
 
 router.get('/{{name}}', function (req, res) {
+    let objArr = [];
     {{name}}.all((rows) => {
-        res.send(JSON.stringify(rows));
+        rows.forEach(row => {
+            let ownProps = Object.getOwnPropertyNames(row);
+            let obj = {};
+            ownProps.forEach(prop => {
+                obj[prop] = row[prop];
+            })
+            objArr.push(obj);
+        })
+        res.send(JSON.stringify(objArr));
     });
 });
 
@@ -55,6 +64,13 @@ router.delete('/{{name}}/:id', function (req, res) {
         }
     });
 });
+
+router.get('/{{name}}/:model/:id', function (req, res) {
+    {{name}}.manyToManyValues(req.params.model, req.params.id, (values) => {
+        res.json(values);
+    })
+});
+
 {{/schemas}}
 
 module.exports = router;

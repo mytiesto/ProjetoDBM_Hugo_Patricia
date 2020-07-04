@@ -5,8 +5,11 @@ var mustache = require('mustache');
 var del = require('del');
 
 var generateClass = require('./classes/classes');
-var generateDB = require('./database/generate-database');
-var generateAPI = require('./restful-api/generate-api');
+var generateDB = require('./database/generate-database').generate;
+var generateDBRelations = require('./database/generate-database').generateRelations;
+var generateAPI = require('./restful-api/generate-api').generate;
+var generateBackoffice = require('./restful-api/generate-api').generateBackoffice;
+var generateFrontoffice = require('./restful-api/generate-api').generateFrontoffice;
 
 const config = JSON.parse(fs.readFileSync('./server/config.json'));
 
@@ -64,15 +67,18 @@ var generate = function(){
     generateDirectories();
 
     copyStaticFiles();
-
+    
     let schemas = generateSchemas();
-    generateDB(config["dbname"], schemas);
-
-    generateAPI(schemas);
-
-    fs.readFile('./server/server.mustache', function(err,data) {
-        var output = mustache.render(data.toString(), config);
-        fs.writeFileSync('index.js',output);
+    generateDB(config["dbname"], schemas, () => {
+        generateDBRelations(config["dbname"], schemas);
+        generateAPI(schemas);
+        generateBackoffice(schemas);
+        generateFrontoffice(schemas);
+    
+        fs.readFile('./server/server.mustache', function(err,data) {
+            var output = mustache.render(data.toString(), config);
+            fs.writeFileSync('index.js',output);
+        });
     });
 
     //childProcess.fork('index.js');

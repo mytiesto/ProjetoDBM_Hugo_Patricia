@@ -7,6 +7,13 @@ class {{title}} {
         {{#enumerables}}
         Object.defineProperty(this, "{{name}}", { enumerable: false });
         {{/enumerables}}
+        {{#references}}
+        Object.defineProperty(this, "{{model}}_id", { enumerable: false, writable: true });
+        {{/references}}
+        {{#MMReferences}}
+        Object.defineProperty(this, "{{label}}", { enumerable: false, writable: true });
+        this.{{label}} = [];
+        {{/MMReferences}}
         Object.defineProperty(this, "id", { enumerable: false, writable: true });
     }
 
@@ -18,15 +25,86 @@ class {{title}} {
         database.get("SELECT * FROM {{title}} WHERE id = ?;", [id], {{title}}, callback)
     }
 
+    static manyToManyValues(model, id, callback){
+        let tablename = "{{title}}".localeCompare(model) === -1 ? "{{title}}_"+model : model+"_{{title}}"+"_ManyToMany";
+        database.where("SELECT "+model+"_id FROM "+tablename+" WHERE {{title}}_id = ?;", [id], undefined, callback);
+    }
+
+    static many(model, id, callback){
+        let tablename = "{{title}}".localeCompare(model) === -1 ? "{{title}}_" + model : model + "_{{title}}_ManyToMany";
+        database.where(`SELECT {{title}}.* FROM {{title}}
+        INNER JOIN ${tablename} ON ${tablename}.{{title}}_id = {{title}}.id
+        WHERE ${tablename}.${model}_id = ?`, [id],
+        undefined, callback);
+    }
+
+    static top(property,order,limit,callback) {
+        database.where(`SELECT * FROM {{title}} ORDER BY ${property} ${order} LIMIT ${limit}`, [], {{title}}, callback);
+    }
+
     static delete(id, callback) {
         database.run("DELETE FROM {{title}} WHERE id = ?;", [id], callback)
     }
 
+    getValues(mm){
+        let res = "";
+        mm.forEach((elem, index) => {
+            if(index == 0)
+                res += "VALUES(?, ?),";
+            else
+                res += "(?, ?),";
+        })
+        res = res.substring(0, res.length - 1);
+        return res;
+    }
+
+    manyToManyIds(mm, id){
+        let res = [];
+        mm.forEach(elem => {
+            res.push(id);
+            res.push(elem);
+        })
+        return res;
+    }
+
     save(callback) {
-        if (this.id)
-            database.run("UPDATE {{title}} SET {{{updateProperties}}} WHERE id = ?;", [{{#properties}}this.{{name}}, {{/properties}}this.id], callback);
-        else
-            database.run("INSERT INTO {{title}} ({{arguments}}) VALUES ({{values}});", [{{insertProperties}}], callback);
+        if (this.id){
+            database.run("UPDATE {{title}} SET {{{updateProperties}}} WHERE id = ?;", [{{#properties}}this.{{name}}, {{/properties}}this.id], 
+            {{#hasMMReferences}}
+            res => {
+                {{#MMReferences}}
+                let tablename{{model}} = "{{title}}".localeCompare("{{model}}") === -1 ? "{{title}}_{{model}}" : "{{model}}_{{title}}"+"_ManyToMany";
+                database.run("DELETE FROM "+tablename{{model}}+" WHERE {{title}}_id = ?;", [this.id], () => {
+                    if(Array.isArray(this.{{label}}))
+                        database.run("INSERT INTO "+tablename{{model}}+" ({{title}}_id, {{model}}_id) "+this.getValues(this.{{label}})+";", this.manyToManyIds(this.{{label}}, this.id), callback);
+                    else
+                        database.run("INSERT INTO "+tablename{{model}}+" ({{title}}_id, {{model}}_id) VALUES(?, ?);", [this.id, this.{{label}}], callback);  
+                });
+                {{/MMReferences}}
+            }
+            {{/hasMMReferences}}
+            {{^hasMMReferences}}
+            callback
+            {{/hasMMReferences}}
+            );
+        }else{
+            database.run("INSERT INTO {{title}} ({{arguments}}) VALUES ({{values}});", [{{insertProperties}}], 
+            {{#hasMMReferences}}
+            res => {
+                {{#MMReferences}}
+                let tablename{{model}} = "{{title}}".localeCompare("{{model}}") === -1 ? "{{title}}_{{model}}" : "{{model}}_{{title}}"+"_ManyToMany";
+                if(Array.isArray(this.{{label}}))
+                    database.run("INSERT INTO "+tablename{{model}}+" ({{title}}_id, {{model}}_id) "+this.getValues(this.{{label}})+";", this.manyToManyIds(this.{{label}}, res.lastId), callback);
+                else
+                    database.run("INSERT INTO "+tablename{{model}}+" ({{title}}_id, {{model}}_id) VALUES(?, ?);", [res.lastId, this.{{label}}], callback);
+                {{/MMReferences}}
+            }
+            {{/hasMMReferences}}
+            {{^hasMMReferences}}
+            callback
+            {{/hasMMReferences}}
+            );
+        }
     }
 }
 

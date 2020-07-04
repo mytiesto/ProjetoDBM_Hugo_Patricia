@@ -16,4 +16,28 @@ var generate = (schemas) => {
     });
 };
 
-module.exports = generate;
+var generateBackoffice = (schemas) => {
+    let view = {
+        schemas: schemas.map(elem => {return {title: elem.name}})
+    }
+    fs.readFile('./server/backoffice/backoffice.mustache', (err, data) => {
+        var output = mustache.render(data.toString(), view);
+        fs.writeFileSync('./publish/Controllers/backoffice.js', output);
+    })
+}
+
+var generateFrontoffice = (schemas) => {
+    let view = {
+        schemas: schemas.map(elem => {return {title: elem.name}})
+    }
+    fs.readFile('./server/frontoffice/frontoffice.mustache', (err, data) => {
+        var output = mustache.render(data.toString(), view);
+        fs.writeFileSync('./publish/Controllers/frontoffice.js', output);
+    })
+}
+
+module.exports = {
+    generate: generate,
+    generateBackoffice: generateBackoffice,
+    generateFrontoffice: generateFrontoffice
+};

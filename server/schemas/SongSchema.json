@@ -5,16 +5,20 @@
     "properties": {
         "name": {
             "type": "string"
-        },
-        "artist_id": {
-            "type": "integer"
-        },
-        "album_id": {
-            "type": "integer"
-        },
-        "genre_id": {
-            "type": "integer"
         }
     },
-    "required": ["name"]
+    "required": ["name"],
+    "references": [{
+        "model": "Artist",
+        "relation": "1-M",
+        "label": "artist"
+    },{
+        "model": "Album",
+        "relation": "1-M",
+        "label": "album"
+    },{
+        "model": "Genre",
+        "relation": "M-M",
+        "label": "genres"
+    }]
 }

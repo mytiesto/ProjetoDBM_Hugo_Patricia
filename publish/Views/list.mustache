@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    </head>
+    <body>
+        {{>menu}}
+        <div class="text-center">
+            <h1 class="mb-2">{{title}}</h1>
+            <a class="btn btn-primary mb-2" href="http://localhost:8081/backoffice/{{title}}/Insert" role="button">Inserir novo registo</a>
+            <br><input id="searchBar" type="text" placeholder="pesquisar...">
+        </div>
+        <table id="table" class="table">
+            <thead>
+                <tr>
+                    {{#columns}}
+                    <th scope="col">{{.}}</th>
+                    {{/columns}}
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#rows}}
+                <tr>
+                    {{#properties}}
+                    <td class="col">{{.}}</td>
+                    {{/properties}}
+                    <td>
+                        <a class="btn btn-info" href="/backoffice/{{title}}/Details/{{id}}" role="button">Detalhes</a>
+                        <a class="btn btn-primary" href="/backoffice/{{title}}/Edit/{{id}}" role="button">Editar</a>
+                        <a class="btn btn-danger" href="#" role="button">Eliminar</a>
+                    </td>
+                </tr>
+                {{/rows}}
+            </tbody>
+        </table>
+        <script>
+            function onKeyUp(e){
+                let inputVal = e.target.value.toLowerCase();
+                if(inputVal.length > 0){
+                    var table = document.getElementById("table");
+                    var rowsElems = table.getElementsByTagName("tr");
+                    for(let rowElem in rowsElems){
+                        var colsElems = rowElem.getElementsByTagName("td");
+                        for(let colElem in colsElems){
+                            let rowStr = "";
+                            if(colElem.getAttribute("class") == "col")
+                                rowStr += colElem.innerHTML+" ";
+                        }
+                        rowStr = rowStr.toLowerCase();
+                        if(!rowStr.includes(inputVal))
+                            rowElem.setAttribute("style", "display: none;");
+                        else
+                            rowElem.setAttribute("style", "display: table-row;");
+                    }   
+                }
+            }
+            document.getElementById("searchBar").addEventListener("keyup", onKeyUp);
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+    </body>
+</html>

@@ -1,0 +1,2 @@
+ALTER TABLE {{rightTableName}} ADD COLUMN {{leftTableName}}_id INTEGER REFERENCES {{leftTableName}}(id);
+CREATE UNIQUE INDEX {{leftTableName}}_{{rightTableName}}_OneToOne ON {{rightTableName}}({{leftTableName}}_id););

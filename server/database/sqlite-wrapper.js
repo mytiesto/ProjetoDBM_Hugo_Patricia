@@ -22,16 +22,18 @@ module.exports = function (dbpath) {
             let db = new sqlite3.Database(dbpath);
             db.run(statement, params, function (err) {
                 if (callback)
-                    callback({ success: !err, error: err, rowsAffected: this.changes });
+                    callback({ success: !err, error: err, rowsAffected: this.changes, lastId: this.lastID });
             });
             db.close();
         },
         where: function (statement, params, type, callback) {
             let db = new sqlite3.Database(dbpath);
             db.all(statement, params, function (err, rows) {
-                rows = rows.map(function (object) {
-                    return Object.assign(new type(), object);;
-                });
+                if(type != undefined){
+                    rows = rows.map(function (object) {
+                        return Object.assign(new type(), object);;
+                    });
+                }
                 callback(rows);
             });
             db.close();

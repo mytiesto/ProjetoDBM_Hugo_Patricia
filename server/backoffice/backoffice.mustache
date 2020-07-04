@@ -1,0 +1,180 @@
+const express = require('express');
+var router = express.Router();
+var mustacheExpress = require('mustache-express');
+
+{{#schemas}}
+var {{title}} = require('../Models/{{title}}.js');
+var schema{{title}} = require('../Schemas/{{title}}Schema.json');
+{{/schemas}}
+
+var objWithInputTypes = (schema, obj) => { //Adds {type: ...}
+    Object.entries(schema.properties).forEach(([property, value]) => {
+        let type;
+        switch(value.type){
+            case "string":
+                type = "text";
+                break;
+            case "integer": case "number":
+                type = "number";
+                break;
+        }
+        let index = obj.findIndex(elem => elem.name == property);
+        obj[index].type = type;
+    })
+    return obj;
+}
+
+var objWithInputRequired = (schema, obj) => { //Adds {required: ...}
+    schema.required.forEach(requiredProperty => {
+        let index = obj.findIndex(elem => elem.name == requiredProperty);
+        obj[index].required = "required";
+    })
+    return obj;
+}
+
+var objWithValidPropertiesAndValues = (schema, record) => {
+    let allProps = Object.getOwnPropertyNames(record);
+    let validProps = [];
+    allProps.forEach(function (property){
+        if(schema.properties.hasOwnProperty(property)){
+            let presentationMode = schema.properties[property].presentationMode;
+            validProps.push({
+                name: property,
+                value: record[property],
+                required: "",
+                isElse: presentationMode == undefined,
+                isImage: presentationMode == "image",
+                isVideo: presentationMode == "video"
+                });
+        }
+    })
+    return validProps;
+}
+
+var objWithAllPropertiesAndValues = (schema, record) => {
+    let allProps = Object.getOwnPropertyNames(record);
+    let obj = [];
+    allProps.forEach(function (property){
+        obj.push({name: property, value: record[property], required: ""});
+    })
+    return obj;
+}
+
+var objWithValidProperties = (schema) => {
+    let validProps = [];
+    Object.entries(schema.properties).forEach(([property, value]) => {
+        validProps.push({name: property, required: ""});
+    })
+    return validProps;
+}
+
+var objReferences = (schema, row, id, title) => {
+    var allRefs = [];
+    if (schema.references) {
+        schema.references.forEach(function (ref) {
+            allRefs.push({
+                labelRef: ref.label,
+                model: ref.model,
+                values: ref.relation === "M-M" ? '/'+title+'/' + id : row[(ref.model + "_id")],
+                isManyToMany: ref.relation === "M-M"
+            });
+        });
+    }
+    return allRefs;
+}
+
+var navView = (activeSchema) => {
+    let schemas = []
+    {{#schemas}}
+    schemas.push({
+        isCurrentPage: '{{title}}' == activeSchema,
+        href: '/{{title}}',
+        name: '{{title}}'
+    })
+    {{/schemas}}
+    return schemas;
+}
+
+{{#schemas}}
+var {{title}} = require('../Models/{{title}}.js');
+var schema{{title}} = require('../Schemas/{{title}}Schema.json');
+
+router.get('/{{title}}', function (req, res) {
+    let view = {
+        title: "{{title}}",
+        columns: "",
+        rows: [],
+        schemas: navView('{{title}}'),
+        hasNoCurrentPage: false
+    }
+    {{title}}.all(rows => {
+        rows.forEach((elem,index) => {
+            let keys = Object.keys(elem);
+            if(index == 0)
+                view.columns = keys;
+            view.rows.push({properties: [], id: elem.id});
+            Object.keys(elem).forEach(property => {
+                view.rows[index].properties.push(elem[property]);
+            })
+        })
+        res.render('list', view);
+    });
+});
+
+router.get('/{{title}}/Details/:id', function (req, res) {
+    let id = req.params.id;
+    let view = {
+        title: "{{title}}",
+        properties: "",
+        id: id,
+        references: [],
+        hasReferences: false,
+        schemas: navView('{{title}}'),
+        hasNoCurrentPage: false
+    }
+    {{title}}.get(id, record => {
+        view.references = objReferences(schema{{title}}, record, id, "{{title}}");
+        view.hasReferences = view.references != undefined && view.references.length > 0;
+        view.properties = objWithValidPropertiesAndValues(schema{{title}}, record);
+        res.render('details', view);
+    });
+});
+
+router.get('/{{title}}/Insert', function (req, res) {
+    let view = {
+        title: "{{title}}",
+        properties: objWithValidProperties(schema{{title}}),
+        references: schema{{title}}["references"],
+        hasReferences: false,
+        schemas: navView('{{title}}'),
+        hasNoCurrentPage: false
+    }
+    view.hasReferences = view.references != undefined && view.references.length > 0;
+    res.render('insert', view);
+});
+
+router.get('/{{title}}/Edit/:id', function (req, res) {
+    let id = req.params.id;
+    let view = {
+        title: "{{title}}",
+        id: id,
+        properties: "",
+        references: schema{{title}}["references"],
+        hasReferences: false,
+        schemas: navView('{{title}}'),
+        hasNoCurrentPage: false
+    }
+    {{title}}.get(id, record => {
+        view.references = objReferences(schema{{title}}, record, id, "{{title}}");
+        view.hasReferences = view.references != undefined && view.references.length > 0;
+        let validProps = objWithValidPropertiesAndValues(schema{{title}}, record);
+        validProps = objWithInputRequired(schema{{title}}, validProps);
+        validProps = objWithInputTypes(schema{{title}}, validProps);
+        view.properties = validProps;
+        res.render('edit', view);
+    });
+});
+
+{{/schemas}}
+
+module.exports = router;

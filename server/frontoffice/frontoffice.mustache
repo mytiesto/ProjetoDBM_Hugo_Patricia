@@ -1,0 +1,112 @@
+const express = require('express');
+var router = express.Router();
+var mustacheExpress = require('mustache-express');
+{{#schemas}}
+var schema{{title}} = require('../Schemas/{{title}}Schema.json');
+{{/schemas}}
+
+var otherSchemas = (schemaTitle, reference) => {
+    let otherSchemas = [];
+    otherSchemas.push({
+        name: 'None',
+        selected: reference == undefined ? 'selected' : ''
+    });
+    {{#schemas}}
+        if(schemaTitle != '{{title}}'){
+            otherSchemas.push({
+                name: '{{title}}',
+                selected: ''
+            });
+        }
+        {{/schemas}}
+    if(reference){
+        let index = otherSchemas.findIndex(elem => elem.name == reference.model);
+        otherSchemas[index].selected = 'selected';
+    }
+    return otherSchemas;
+}
+
+var relations = (reference) => {
+    let relations = [];
+    relations.push({
+            name: '1-M',
+            selected: ''
+        });
+    relations.push({
+        name: 'M-M',
+        selected: ''
+    });
+    relations.push({
+        name: '1-1',
+        selected: ''
+    });
+    if(reference){
+        let index = relations.findIndex(rel => rel.name == reference.relation);
+        relations[index].selected = 'selected';
+    }
+    return relations;
+}
+
+var setupCols = (schema, schemaTitle) => {
+    let cols = [];
+    let col = {
+        colName: "",
+        type: "",
+        required: "",
+        otherSchemas: [],
+        relations: [],
+        label: ""
+    }
+
+    let properties = schema.properties;
+    let keys = Object.keys(properties);
+    let arrRequired = schema.required;
+    let references = schema.references;
+
+    keys.forEach(elem => {
+        cols.push({
+            colName: elem,
+            type: properties[elem].type,
+            required: arrRequired.find(req => req == elem) ? 'required' : '',
+            otherSchemas: otherSchemas(schemaTitle),
+            relations: relations(),
+            label: ''
+        })
+    })
+
+    if(references)
+        references.forEach(reference => {
+            cols.push({
+                colName: reference.model+"_id",
+                type: 'id',
+                required: 'required',
+                otherSchemas: otherSchemas(schemaTitle, reference),
+                relations: relations(reference),
+                label: reference.label
+            })
+        })
+    return cols;
+}
+
+var setupSchemas = () => {
+    let schemas = []
+    {{#schemas}}
+    schemas.push({
+        isCurrentPage: false,
+        href: '/{{title}}',
+        name: '{{title}}',
+        col: setupCols(schema{{title}}, '{{title}}')
+    })
+    {{/schemas}}
+    return schemas;
+}
+
+router.get('/', (req, res) => {
+    let view = {
+        schemas: setupSchemas(),
+        hasNoCurrentPage: true
+    };
+    res.render('home', view);
+});
+
+module.exports = router;
