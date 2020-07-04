@@ -30,7 +30,134 @@
             {{/schemas}}
         </div>
         <script>
-            
+            function generateRow(schemaName){
+                let schemaNames = [];
+                let relations = ['1-M', 'M-M', '1-1'];
+                let types = ['string', 'number', 'boolean', 'reference'];
+                schemaNames.push('None');
+                {{#schemas}}
+                if('{{name}}' != schemaName)
+                    schemaNames.push('{{name}}');
+                {{/schemas}}
+                let tr = document.createElement("tr");
+
+                //create colName 
+                let td = document.createElement("td");
+                let input = document.createElement("input");
+                input.setAttribute("name", "colName");
+                input.setAttribute("type", "text");
+                input.setAttribute("placeholder", "Col. name");
+                input.setAttribute("class", "form-control");
+                //append colName
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                //create types
+                td = document.createElement("td");
+                let select = document.createElement("select");
+                select.setAttribute("class", "form-select");
+                //options
+                let option;
+                types.forEach(type => {
+                    option = document.createElement("option");
+                    option.setAttribute("value", type);
+                    option.innerHTML = type;
+                    select.appendChild(option);
+                })
+                //first selected
+                select.selectedIndex = '0';
+                //append types
+                td.appendChild(select);
+                tr.appendChild(td);
+
+                //create form checkbox
+                td = document.createElement("td");
+                let div = document.createElement("div");
+                div.setAttribute("class", "form-check");
+                input = document.createElement("input");
+                input.setAttribute("class", "form-check-input");
+                input.setAttribute("type", "checkbox");
+                input.setAttribute("name", "required");
+                input.setAttribute("id", "required");
+                //append required
+                div.appendChild(input);
+                td.appendChild(div);
+                tr.appendChild(td);
+
+                //create references
+                td = document.createElement("td");
+                select = document.createElement("select");
+                select.setAttribute("class", "form-select");
+                //
+                schemaNames.forEach(schema => {
+                    option = document.createElement("option");
+                    option.setAttribute("value", schema);
+                    option.innerHTML = schema;
+                    select.appendChild(option);
+                })
+                //first selected
+                select.selectedIndex = '0';
+                select.onchange = changedReference;
+                //append references
+                td.appendChild(select);
+                tr.appendChild(td);
+
+                //create relations
+                td = document.createElement("td");
+                select = document.createElement("select");
+                select.setAttribute("class", "form-select");
+                //
+                relations.forEach(relation => {
+                    option = document.createElement("option");
+                    option.setAttribute("value", relation);
+                    option.innerHTML = relation;
+                    select.appendChild(option);
+                })
+                //first selected
+                select.selectedIndex = '0';
+                select.setAttribute("disabled", "");
+                //append relations
+                td.appendChild(select);
+                tr.appendChild(td);
+
+                //create label
+                td = document.createElement("td");
+                input = document.createElement("input");
+                input.setAttribute("name", "label");
+                input.setAttribute("type", "text");
+                input.setAttribute("placeholder", "Label");
+                input.setAttribute("class", "form-control");
+                input.setAttribute("disabled", "");
+                //append label
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                //create remove button
+                td = document.createElement("td");
+                let button = document.createElement("button");
+                button.setAttribute("id", "removeField");
+                button.setAttribute("type", "button");
+                button.setAttribute("class", "btn btn-danger");
+                button.innerHTML = "Remover";
+                //apend Button
+                td.appendChild(button);
+                tr.appendChild(td);
+
+                return tr;
+            }
+
+            function changedReference(event){
+                console.log(event.target.selectedOptions[0].innerHTML);
+            }
+
+            function addNewField(elem){
+                let buttonId = elem.id;
+                let schema = buttonId.split("_")[1];
+                let lastTR = document.getElementById("addBeforeThis_"+schema);
+                let lastTRParent = lastTR.parentNode;
+                let row = generateRow(schema);
+                lastTRParent.insertBefore(row, lastTR);
+            }
         </script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>

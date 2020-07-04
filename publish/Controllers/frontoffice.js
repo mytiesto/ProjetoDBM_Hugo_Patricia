@@ -46,9 +46,9 @@ var otherSchemas = (schemaTitle, reference) => {
 var relations = (reference) => {
     let relations = [];
     relations.push({
-            name: '1-M',
-            selected: ''
-        });
+        name: '1-M',
+        selected: ''
+    });
     relations.push({
         name: 'M-M',
         selected: ''
@@ -64,15 +64,39 @@ var relations = (reference) => {
     return relations;
 }
 
+var types = (type) => {
+    let types = [];
+    types.push({
+        name: 'string',
+        selected: type == 'string' ? 'selected' : ''
+    })
+    types.push({
+        name: 'number',
+        selected: type == 'number' ? 'selected' : ''
+    })
+    types.push({
+        name: 'boolean',
+        selected: type == 'boolean' ? 'selected' : ''
+    })
+    if(!type){
+        types.push({
+            name: 'reference',
+            selected: 'selected'
+        })
+    }
+    return types;
+}
+
 var setupCols = (schema, schemaTitle) => {
     let cols = [];
     let col = {
         colName: "",
-        type: "",
+        types: [],
         required: "",
         otherSchemas: [],
         relations: [],
-        label: ""
+        disabledRelations: '',
+        label: {}
     }
 
     let properties = schema.properties;
@@ -83,11 +107,15 @@ var setupCols = (schema, schemaTitle) => {
     keys.forEach(elem => {
         cols.push({
             colName: elem,
-            type: properties[elem].type,
-            required: arrRequired.find(req => req == elem) ? 'required' : '',
+            types: types(properties[elem].type),
+            required: arrRequired.find(req => req == elem) ? 'checked' : '',
             otherSchemas: otherSchemas(schemaTitle),
             relations: relations(),
-            label: ''
+            disabledRelations: 'disabled',
+            label: {
+                value: '',
+                disabled: 'disabled'
+            }
         })
     })
 
@@ -95,11 +123,15 @@ var setupCols = (schema, schemaTitle) => {
         references.forEach(reference => {
             cols.push({
                 colName: reference.model+"_id",
-                type: 'id',
-                required: 'required',
+                types: types(),
+                required: 'checked',
                 otherSchemas: otherSchemas(schemaTitle, reference),
                 relations: relations(reference),
-                label: reference.label
+                disabledRelations: '',
+                label: {
+                    value: reference.label,
+                    disabled: ''    
+                }
             })
         })
     return cols;
