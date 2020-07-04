@@ -10,7 +10,7 @@
       <th scope='col'>Actions</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="{{name}}_table">
     {{#col}}
     <tr id="field_{{colName}}">
         <td><input name="colName" type="text" placeholder="Col. name" value="{{colName}}" class="form-control"></td>
@@ -57,7 +57,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td><button id="save" type="button" class="btn btn-primary">Salvar alterações</button></td>
+        <td><button id="save" type="button" onclick="saveSchema('{{name}}')" class="btn btn-primary">Salvar alterações</button></td>
     </tr>
   </tbody>
 </table>

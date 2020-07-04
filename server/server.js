@@ -10,6 +10,7 @@ var generateDBRelations = require('./database/generate-database').generateRelati
 var generateAPI = require('./restful-api/generate-api').generate;
 var generateBackoffice = require('./restful-api/generate-api').generateBackoffice;
 var generateFrontoffice = require('./restful-api/generate-api').generateFrontoffice;
+var generateEditor = require('./restful-api/generate-api').generateEditor;
 
 const config = JSON.parse(fs.readFileSync('./server/config.json'));
 
@@ -74,6 +75,7 @@ var generate = function(){
         generateAPI(schemas);
         generateBackoffice(schemas);
         generateFrontoffice(schemas);
+        generateEditor(schemas);
     
         fs.readFile('./server/server.mustache', function(err,data) {
             var output = mustache.render(data.toString(), config);

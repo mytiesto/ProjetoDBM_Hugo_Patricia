@@ -5,6 +5,7 @@ const dbname = "projeto.db";
 
 const backoffice = require('./publish/Controllers/backoffice');
 const frontoffice = require('./publish/Controllers/frontoffice');
+const editor = require('./publish/Controllers/editor');
 
 const api = require("./publish/Controllers/api");
 
@@ -22,6 +23,7 @@ app.use('/api', api);
 
 app.use('/backoffice', backoffice);
 app.use('/frontoffice', frontoffice);
+app.use('/editor', editor);
 
 //routes
 

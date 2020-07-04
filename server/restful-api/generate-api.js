@@ -36,8 +36,19 @@ var generateFrontoffice = (schemas) => {
     })
 }
 
+var generateEditor = (schemas) => {
+    let view = {
+        schemas: schemas.map(elem => {return {title: elem.name}})
+    }
+    fs.readFile('./server/editor/editor.mustache', (err, data) => {
+        var output = mustache.render(data.toString(), view);
+        fs.writeFileSync('./publish/Controllers/editor.js', output);
+    })
+}
+
 module.exports = {
     generate: generate,
     generateBackoffice: generateBackoffice,
-    generateFrontoffice: generateFrontoffice
+    generateFrontoffice: generateFrontoffice,
+    generateEditor: generateEditor
 };

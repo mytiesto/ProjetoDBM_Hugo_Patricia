@@ -1,0 +1,14 @@
+const express = require('express');
+var router = express.Router();
+
+{{#schemas}}
+var schema{{title}} = require('../Schemas/{{title}}Schema.json');
+{{/schemas}}
+
+{{#schemas}}
+router.put('/{{title}}', (req, res) => {
+    console.log(res.body);
+})
+{{/schemas}}
+
+module.exports = router;
