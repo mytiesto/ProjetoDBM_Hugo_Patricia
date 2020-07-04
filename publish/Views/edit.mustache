@@ -7,20 +7,25 @@
         <div class="text-center">
             <h1>Editar {{title}}</h1>
         </div>
-        <form id="form" class="row g-3">
-            <input type="hidden" name="id" value="{{id}}">
-            {{#properties}}
-            <div class="col-md-6">
-                <label for="input{{name}}" class="form-label">{{name}}:</label>
-                <input type="{{type}}" name="{{name}}" class="form-control" id="input{{name}}" value="{{value}}" {{required}}>
+        <div class="container text-center">
+            <form id="form" class="row g-3">
+                <input type="hidden" name="id" value="{{id}}">
+                {{#properties}}
+                <div>
+                    <label for="input{{name}}" class="form-label">{{name}}:</label>
+                    <input type="{{type}}" name="{{name}}" class="form-control" id="input{{name}}" value="{{value}}" {{required}}>
+                </div>
+                {{/properties}}
+                {{#references}}
+                <label>{{model}}:</label>
+                <div id="div{{model}}value"></div>
+                {{/references}}
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+            <div id="alert" style="display: none;" class="alert alert-success" role="alert">
+                Guardado com sucesso.
             </div>
-            {{/properties}}
-            {{#references}}
-            <label>{{model}}:</label>
-            <div id="div{{model}}value"></div>
-            {{/references}}
-            <button type="submit" class="btn btn-primary">Save</button>
-        </form>
+        </div>
         <script>
             var form = document.getElementById("form");
             function handleForm(e){
@@ -43,6 +48,11 @@
                 str = str.substring(0, str.length - 1);
                 var xhttp = new XMLHttpRequest();
                 xhttp.open("PUT", "/api/{{title}}/"+id, true);
+                xhttp.onreadystatechange = function () {
+                    if(xhttp.readyState === 4 && xhttp.status === 200) {
+                        document.getElementById("alert").setAttribute("style", "display: block;");
+                    }
+                }
                 xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
                 xhttp.send(str);
             }

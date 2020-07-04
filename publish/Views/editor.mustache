@@ -15,7 +15,7 @@
     <tr id="field_{{colName}}">
         <td><input name="colName" type="text" placeholder="Col. name" value="{{colName}}" class="form-control"></td>
         <td>
-            <select class="form-select">
+            <select class="form-select" {{disabledTypes}}>
                 {{#types}}
                 <option value="{{name}}" {{selected}}>{{name}}</option>
                 {{/types}}
@@ -44,7 +44,7 @@
         <td><input name="label" type="text" placeholder="Label" value="{{value}}" class="form-control" {{disabled}}></td>
         {{/label}}
         <td>
-            <button id="removeField" type="button" class="btn btn-danger">Remover</button>
+            <button id="removeField" onclick="removeField(event)" type="button" class="btn btn-danger">Remover</button>
         </td>
     </tr>
     {{/col}}

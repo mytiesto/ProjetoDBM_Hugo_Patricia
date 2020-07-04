@@ -26,7 +26,7 @@ var generate = function (schema, dbname){
 
         view.properties.push({name: key});
 
-        view.updateProperties += key+" = this."+key+", ";
+        view.updateProperties += key+" = ?, ";
 
         view.insertProperties += "this."+key+", ";
 

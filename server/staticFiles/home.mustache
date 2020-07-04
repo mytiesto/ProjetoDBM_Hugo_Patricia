@@ -139,6 +139,7 @@
                 button.setAttribute("type", "button");
                 button.setAttribute("class", "btn btn-danger");
                 button.innerHTML = "Remover";
+                button.onclick = removeField;
                 //apend Button
                 td.appendChild(button);
                 tr.appendChild(td);
@@ -147,7 +148,23 @@
             }
 
             function changedReference(event){
-                console.log(event.target.selectedOptions[0].innerHTML);
+                let selectedIndex = event.target.selectedIndex;
+                let select = event.target;
+                let row = select.parentNode.parentNode;
+                let type = row.children.item(1).children.item(0);
+                let relation = row.children.item(4).children.item(0);
+                let label = row.children.item(5).children.item(0);
+                if(selectedIndex == 0){
+                    type.removeAttribute("disabled");
+                    type.selectedIndex = 0;
+                    relation.setAttribute("disabled", "");
+                    label.setAttribute("disabled", "");
+                } else {
+                    type.selectedIndex = 3;
+                    type.setAttribute("disabled", "");
+                    relation.removeAttribute("disabled");
+                    label.removeAttribute("disabled");
+                }
             }
 
             function addNewField(elem){
@@ -157,6 +174,11 @@
                 let lastTRParent = lastTR.parentNode;
                 let row = generateRow(schema);
                 lastTRParent.insertBefore(row, lastTR);
+            }
+
+            function removeField(event){
+                let tr = event.target.parentNode.parentNode;
+                tr.remove();
             }
         </script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

@@ -78,12 +78,10 @@ var types = (type) => {
         name: 'boolean',
         selected: type == 'boolean' ? 'selected' : ''
     })
-    if(!type){
-        types.push({
-            name: 'reference',
-            selected: 'selected'
-        })
-    }
+    types.push({
+        name: 'reference',
+        selected: type == undefined ? 'selected' : ''
+    })
     return types;
 }
 
@@ -108,6 +106,7 @@ var setupCols = (schema, schemaTitle) => {
         cols.push({
             colName: elem,
             types: types(properties[elem].type),
+            disabledTypes: '',
             required: arrRequired.find(req => req == elem) ? 'checked' : '',
             otherSchemas: otherSchemas(schemaTitle),
             relations: relations(),
@@ -124,6 +123,7 @@ var setupCols = (schema, schemaTitle) => {
             cols.push({
                 colName: reference.model+"_id",
                 types: types(),
+                disabledTypes: 'disabled',
                 required: 'checked',
                 otherSchemas: otherSchemas(schemaTitle, reference),
                 relations: relations(reference),
